@@ -1,2 +1,178 @@
 # Index.html
 AirDrop
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Spin & Earn Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to bottom, #3b1d8c, #ff914d);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    h1 { margin-top: 20px; }
+    .menu { margin: 20px; }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .spin-btn { background: purple; color: white; }
+    .mine-btn { background: orange; color: black; }
+    .earn-btn { background: green; color: white; }
+    .invite-btn { background: blue; color: white; }
+    .result { margin: 20px; font-size: 18px; }
+
+    #earnOptions { margin-top: 10px; }
+    .social-btn {
+      display: inline-block;
+      margin: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* Spinner */
+    #spinnerContainer {
+      margin: 20px auto;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 10px solid rgba(255,255,255,0.3);
+      border-top: 10px solid #fff;
+      animation: spin 0s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎰 Spin & Earn Game</h1>
+
+  <div class="menu">
+    <button class="spin-btn" onclick="startSpin()">Spin</button>
+    <button class="mine-btn" onclick="mine()">Mine</button>
+    <button class="earn-btn" onclick="earnMenu()">Earn</button>
+    <button class="invite-btn" onclick="invite()">Invite</button>
+  </div>
+
+  <div id="spinnerContainer"></div>
+
+  <div class="result" id="result">Balance: <span id="coins">0</span> Coins | Tickets: <span id="tickets">0</span></div>
+
+  <div id="earnOptions" style="display:none;">
+    <h2>Earn Options</h2>
+    <button onclick="watchAds()">📺 Watch Ads (+2000 Coins)</button><br>
+    <button onclick="openYouTube()">▶️ YouTube (+200 Coins)</button><br>
+    <button onclick="openFacebook()">📘 Facebook (+300 Coins)</button><br>
+    <button onclick="openX()">🐦 X / Twitter (+200 Coins)</button>
+    <div style="margin-top:12px;">
+      <a class="social-btn" href="https://youtube.com/@cryptominehubbot?si=wxrcRfQf_RfUw5xV" target="_blank" rel="noopener noreferrer">YouTube Channel</a>
+      <a class="social-btn" href="https://www.facebook.com/share/18mNPPY4X1/" target="_blank" rel="noopener noreferrer">Facebook Page</a>
+      <a class="social-btn" href="https://x.com/bollywood40641?t=TGeVNHglkf2oGa7fj_v3lA&s=08" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+    </div>
+  </div>
+
+  <script>
+    const LINKS = {
+      youtube: "https://youtube.com/@cryptominehubbot?si=wxrcRfQf_RfUw5xV",
+      facebook: "https://www.facebook.com/share/18mNPPY4X1/",
+      x: "https://x.com/bollywood40641?t=TGeVNHglkf2oGa7fj_v3lA&s=08"
+    };
+
+    let coins = parseInt(localStorage.getItem("coins")) || 0;
+    let tickets = parseInt(localStorage.getItem("tickets")) || 0;
+    let lastSpin = localStorage.getItem("lastSpin") ? new Date(localStorage.getItem("lastSpin")) : null;
+
+    function updateDisplay() {
+      document.getElementById("coins").innerText = coins;
+      document.getElementById("tickets").innerText = tickets;
+    }
+
+    window.addEventListener('load', updateDisplay);
+
+    function startSpin() {
+      let now = new Date();
+      if (lastSpin && (now - lastSpin) < 24 * 60 * 60 * 1000 && tickets === 0) {
+        alert("❌ You can only spin once every 24 hours!");
+        return;
+      }
+
+      document.getElementById("spinnerContainer").style.animation = "spin 2s linear infinite";
+      setTimeout(spin, 2000);
+    }
+
+    function spin() {
+      document.getElementById("spinnerContainer").style.animation = "none";
+
+      let rewards = ["100 USDT", "200 Coins", "500 Coins", "50 Coins", "Ticket"];
+      let win = rewards[Math.floor(Math.random() * rewards.length)];
+
+      if (win === "100 USDT") {
+        win = "Sorry! No USDT won ❌";
+      } else if (win.includes("Coins")) {
+        let add = parseInt(win.split(" ")[0]);
+        coins += add;
+      } else if (win === "Ticket") {
+        tickets += 1;
+      }
+
+      if (tickets === 0) lastSpin = new Date();
+
+      // Save to localStorage
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("tickets", tickets);
+      localStorage.setItem("lastSpin", lastSpin);
+
+      document.getElementById("result").innerText = "🎉 You won: " + win + " | Balance: " + coins + " Coins | Tickets: " + tickets;
+      updateDisplay();
+    }
+
+    function mine() {
+      coins += 10;
+      localStorage.setItem("coins", coins);
+      updateDisplay();
+    }
+
+    function earnMenu() {
+      const el = document.getElementById("earnOptions");
+      el.style.display = (el.style.display === "block") ? "none" : "block";
+    }
+
+    function invite() {
+      let refLink = prompt("Share this referral link with your friends to earn 500 Coins:\n\nhttps://yourgame.com/referral?user=12345");
+      if(refLink !== null){
+        coins += 500;
+        localStorage.setItem("coins", coins);
+        updateDisplay();
+        alert("✅ Invite Successful! +500 Coins");
+      }
+    }
+
+    function watchAds() {
+      coins += 2000;
+      localStorage.setItem("coins", coins);
+      updateDisplay();
+      alert("📺 Watched Ad: +2000 Coins");
+    }
+
+    function openYouTube() { coins += 200; localStorage.setItem("coins", coins); updateDisplay(); window.open(LINKS.youtube, "_blank", "noopener"); }
+    function openFacebook() { coins += 300; localStorage.setItem("coins", coins); updateDisplay(); window.open(LINKS.facebook, "_blank", "noopener"); }
+    function openX() { coins += 200; localStorage.setItem("coins", coins); updateDisplay(); window.open(LINKS.x, "_blank", "noopener"); }
+  </script>
+</body>
+</html>
